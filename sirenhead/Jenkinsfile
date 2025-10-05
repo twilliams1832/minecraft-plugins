@@ -17,19 +17,7 @@ pipeline {
     }
 
     stages {
-        stage('Mount Artifact Share') {
-    steps {
-        script {
-            withCredentials([usernamePassword(credentialsId: 'naspi-admin', usernameVariable: 'CIFS_USER', passwordVariable: 'CIFS_PASS')]) {
-                sh """
-                    chmod +x sirenhead/scripts/mount_share.sh
-                    sirenhead/scripts/mount_share.sh "${params.CIFS_SERVER}" "${params.CIFS_SHARE}" "${params.ARTIFACT_PATH}" "\$CIFS_USER" "\$CIFS_PASS"
-                """
-            }
-        }
-    }
-}
-
+        
         stage('Checkout') {
             steps {
                 git url: "${params.REPO_URL}", branch: "${params.BRANCH}", credentialsId: 'git-credentials'
