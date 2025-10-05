@@ -25,15 +25,13 @@ pipeline {
                     echo "🔧 Mounting network share..."
                     mkdir -p ${params.ARTIFACT_PATH}
                     mount -t cifs //${params.CIFS_SERVER}/${params.CIFS_SHARE} ${params.ARTIFACT_PATH} \\
-                        -o username=$CIFS_USER,password=$CIFS_PASS,rw,uid=\\$(id -u),gid=\\$(id -g)
+                        -o username=\$CIFS_USER,password=\$CIFS_PASS,rw,uid=\\\$(id -u),gid=\\\$(id -g)
                     mountpoint -q ${params.ARTIFACT_PATH} || { echo '❌ Mount failed'; exit 1; }
                 '''
             }
         }
     }
 }
-
-
         stage('Checkout') {
             steps {
                 git url: "${params.REPO_URL}", branch: "${params.BRANCH}", credentialsId: 'git-credentials'
