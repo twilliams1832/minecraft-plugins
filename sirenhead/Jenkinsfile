@@ -4,7 +4,9 @@ pipeline {
     parameters {
         string(name: 'REPO_URL', defaultValue: 'https://github.com/twilliams1832/minecraft-plugins.git', description: 'Git repository URL')
         string(name: 'BRANCH', defaultValue: 'main', description: 'Git branch to build')
-        string(name: 'ARTIFACT_PATH', defaultValue: 'artifacts', description: 'Host path for bind-mounted artifact output')
+        string(name: 'CIFS_SERVER', defaultValue: 'naspi.local', description: 'CIFS server hostname or IP')
+        string(name: 'CIFS_SHARE', defaultValue: 'cert-artifacts', description: 'CIFS share name')
+        string(name: 'ARTIFACT_PATH', defaultValue: 'artifacts', description: 'Mount point for artifact output')
     }
 
     environment {
@@ -16,20 +18,21 @@ pipeline {
 
     stages {
         stage('Mount Artifact Share') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'naspi-admin', usernameVariable: 'CIFS_USER', passwordVariable: 'CIFS_PASS')]) {
-                        sh '''
-                            echo "🔧 Mounting network share..."
-                            mkdir -p ${params.ARTIFACT_PATH}
-                            mount -t cifs //<your-server>/<share> ${params.ARTIFACT_PATH} \\
-                                -o username=$CIFS_USER,password=$CIFS_PASS,rw,uid=$(id -u),gid=$(id -g)
-                            mountpoint -q ${params.ARTIFACT_PATH} || { echo '❌ Mount failed'; exit 1; }
-                        '''
-                    }
-                }
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: 'naspi-admin', usernameVariable: 'CIFS_USER', passwordVariable: 'CIFS_PASS')]) {
+                sh """
+                    echo "🔧 Mounting network share..."
+                    mkdir -p ${params.ARTIFACT_PATH}
+                    mount -t cifs //${params.CIFS_SERVER}/${params.CIFS_SHARE} ${params.ARTIFACT_PATH} \\
+                        -o username=$CIFS_USER,password=$CIFS_PASS,rw,uid=\\$(id -u),gid=\\$(id -g)
+                    mountpoint -q ${params.ARTIFACT_PATH} || { echo '❌ Mount failed'; exit 1; }
+                """
             }
         }
+    }
+}
+
 
         stage('Checkout') {
             steps {
