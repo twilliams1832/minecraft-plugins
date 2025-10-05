@@ -34,8 +34,8 @@ pipeline {
                                 cp -r * ${tempWorkspace}
                                 cd ${tempWorkspace}/sirenhead
                                 mvn clean package
-                                ls /mnt/artifacts
                                 ls /mnt
+                                stat /mnt/artifacts
                                 echo "cp target/*.jar ${env.MOUNT_PATH}/${env.JAR_NAME}"
                                 echo "🧹 Cleaning up temp workspace..."
                                 rm -rf ${tempWorkspace}
