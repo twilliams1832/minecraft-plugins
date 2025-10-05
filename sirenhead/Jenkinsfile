@@ -63,7 +63,7 @@ pipeline {
 
         stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: "${env.WORKSPACE}/${env.JAR_NAME}", fingerprint: true
+                archiveArtifacts artifacts: ${env.JAR_NAME}, fingerprint: true
             }
         }
     }
