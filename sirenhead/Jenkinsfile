@@ -19,13 +19,13 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'naspi-admin', usernameVariable: 'CIFS_USER', passwordVariable: 'CIFS_PASS')]) {
-                        sh """
+                        sh '''
                             echo "🔧 Mounting network share..."
                             mkdir -p ${params.ARTIFACT_PATH}
                             mount -t cifs //<your-server>/<share> ${params.ARTIFACT_PATH} \\
                                 -o username=$CIFS_USER,password=$CIFS_PASS,rw,uid=$(id -u),gid=$(id -g)
                             mountpoint -q ${params.ARTIFACT_PATH} || { echo '❌ Mount failed'; exit 1; }
-                        """
+                        '''
                     }
                 }
             }
