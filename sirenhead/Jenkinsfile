@@ -22,8 +22,8 @@ pipeline {
         script {
             withCredentials([usernamePassword(credentialsId: 'naspi-admin', usernameVariable: 'CIFS_USER', passwordVariable: 'CIFS_PASS')]) {
                 sh """
-                    chmod +x scripts/mount_share.sh
-                    scripts/mount_share.sh "${params.CIFS_SERVER}" "${params.CIFS_SHARE}" "${params.ARTIFACT_PATH}" "\$CIFS_USER" "\$CIFS_PASS"
+                    chmod +x sirenhead/scripts/mount_share.sh
+                    sirenhead/scripts/mount_share.sh "${params.CIFS_SERVER}" "${params.CIFS_SHARE}" "${params.ARTIFACT_PATH}" "\$CIFS_USER" "\$CIFS_PASS"
                 """
             }
         }
