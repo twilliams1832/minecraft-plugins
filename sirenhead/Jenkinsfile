@@ -1,11 +1,11 @@
+def tempWorkspace = "/tmp/sirenhead-${env.BUILD_ID}"
+
 pipeline {
     agent { label 'lnxbld1' }
 
     parameters {
         string(name: 'REPO_URL', defaultValue: 'https://github.com/twilliams1832/minecraft-plugins.git', description: 'Git repository URL')
         string(name: 'BRANCH', defaultValue: 'main', description: 'Git branch to build')
-        string(name: 'CIFS_SERVER', defaultValue: 'naspi', description: 'CIFS server hostname or IP')
-        string(name: 'CIFS_SHARE', defaultValue: 'walle', description: 'CIFS share name')
         string(name: 'ARTIFACT_PATH', defaultValue: '/mnt/share/walle/artifacts', description: 'Mount point for artifact output')
     }
 
@@ -22,10 +22,26 @@ pipeline {
             }
         }
 
+        stage('Precheck Mount') {
+            steps {
+                sh """
+                    echo "🔍 Checking mount accessibility..."
+                    if ! mountpoint -q ${params.ARTIFACT_PATH}; then
+                        echo "❌ Mount point ${params.ARTIFACT_PATH} is not active"
+                        exit 1
+                    fi
+                    touch ${params.ARTIFACT_PATH}/.jenkins_write_test || {
+                        echo "❌ Cannot write to ${params.ARTIFACT_PATH}"
+                        exit 1
+                    }
+                    rm ${params.ARTIFACT_PATH}/.jenkins_write_test
+                """
+            }
+        }
+
         stage('Build in Docker') {
             steps {
                 script {
-                    def tempWorkspace = "/tmp/sirenhead-${env.BUILD_ID}"
                     docker.withRegistry('https://registry.home', 'docker-registry-credentials') {
                         docker.image(env.DOCKER_IMAGE).inside("--mount type=bind,source=${params.ARTIFACT_PATH},target=${env.MOUNT_PATH}") {
                             sh """
@@ -34,9 +50,8 @@ pipeline {
                                 cp -r * ${tempWorkspace}
                                 cd ${tempWorkspace}/sirenhead
                                 mvn clean package
-                                ls /mnt
-                                stat /mnt/artifacts
                                 cp target/*.jar ${env.MOUNT_PATH}/${env.JAR_NAME}
+                                cp target/*.jar ${env.WORKSPACE}/${env.JAR_NAME}
                                 echo "🧹 Cleaning up temp workspace..."
                                 rm -rf ${tempWorkspace}
                             """
@@ -48,7 +63,7 @@ pipeline {
 
         stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: "${params.ARTIFACT_PATH}/${env.JAR_NAME}", fingerprint: true
+                archiveArtifacts artifacts: "${env.WORKSPACE}/${env.JAR_NAME}", fingerprint: true
             }
         }
     }
