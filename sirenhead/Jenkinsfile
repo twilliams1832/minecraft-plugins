@@ -37,7 +37,7 @@ pipeline {
                                 ls /mnt
                                 stat /mnt/artifacts
                                 whoami
-                                echo "cp target/*.jar ${env.MOUNT_PATH}/${env.JAR_NAME}"
+                                cp target/*.jar ${env.MOUNT_PATH}/${env.JAR_NAME}
                                 echo "🧹 Cleaning up temp workspace..."
                                 rm -rf ${tempWorkspace}
                             """
