@@ -6,18 +6,16 @@ pipeline {
         string(name: 'BRANCH', defaultValue: 'main', description: 'Git branch to build')
         string(name: 'CIFS_SERVER', defaultValue: 'naspi', description: 'CIFS server hostname or IP')
         string(name: 'CIFS_SHARE', defaultValue: 'walle', description: 'CIFS share name')
-        string(name: 'ARTIFACT_PATH', defaultValue: 'artifacts', description: 'Mount point for artifact output')
+        string(name: 'ARTIFACT_PATH', defaultValue: '/mnt/share/walle/artifacts', description: 'Mount point for artifact output')
     }
 
     environment {
         DOCKER_IMAGE = 'registry.home/openjdk-maven:17'
         MOUNT_PATH = '/mnt/artifacts'
-        PROJECT_DIR = '/workspace/sirenhead'
         JAR_NAME = 'SirenHeadPlugin.jar'
     }
 
     stages {
-        
         stage('Checkout') {
             steps {
                 git url: "${params.REPO_URL}", branch: "${params.BRANCH}", credentialsId: 'git-credentials'
@@ -27,15 +25,18 @@ pipeline {
         stage('Build in Docker') {
             steps {
                 script {
+                    def tempWorkspace = "/tmp/sirenhead-${env.BUILD_ID}"
                     docker.withRegistry('https://registry.home', 'docker-registry-credentials') {
                         docker.image(env.DOCKER_IMAGE).inside("--mount type=bind,source=${params.ARTIFACT_PATH},target=${env.MOUNT_PATH}") {
                             sh """
-                                echo "🚧 Building plugin..."
-                                mkdir -p ${env.PROJECT_DIR}
-                                cp -r * ${env.PROJECT_DIR}
-                                cd ${env.PROJECT_DIR}
+                                echo "🚧 Creating temp workspace at ${tempWorkspace}..."
+                                mkdir -p ${tempWorkspace}
+                                cp -r * ${tempWorkspace}
+                                cd ${tempWorkspace}
                                 mvn clean package
                                 cp target/*.jar ${env.MOUNT_PATH}/${env.JAR_NAME}
+                                echo "🧹 Cleaning up temp workspace..."
+                                rm -rf ${tempWorkspace}
                             """
                         }
                     }
