@@ -1,4 +1,4 @@
-package com.yourname.sirenhead;
+package com.customplugin.sirenhead;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
