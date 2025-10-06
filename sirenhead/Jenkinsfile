@@ -26,8 +26,8 @@ pipeline {
             steps {
                 sh """
                     echo "🔍 Checking mount accessibility..."
-                    if ! mountpoint -q /mnt/share/walle; then
-                       echo "❌ Mount point /mnt/share/walle is not active"
+                    if ! mountpoint -q /mnt/share/artifacts; then
+                       echo "❌ Mount point /mnt/share/artifacts is not active"
                        exit 1
                     fi
                     touch ${params.ARTIFACT_PATH}/.jenkins_write_test || {
