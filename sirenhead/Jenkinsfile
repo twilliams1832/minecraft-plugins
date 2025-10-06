@@ -72,12 +72,6 @@ pipeline {
         always {
             echo "🧹 Cleaning up..."
             sh """
-                if mountpoint -q ${params.ARTIFACT_PATH}; then
-                    umount ${params.ARTIFACT_PATH}
-                    echo "✅ Unmounted ${params.ARTIFACT_PATH}"
-                else
-                    echo "ℹ️ No mount to clean up"
-                fi
             """
         }
         success {
