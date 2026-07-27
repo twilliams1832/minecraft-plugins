@@ -1,0 +1,79 @@
+{
+  "format_version": 1,
+  "blocks": {
+    "minecraft:jigsaw": {
+      "name": "toilet_bowl",
+      "display_name": "Toilet Bowl",
+      "only_override_states": true,
+      "state_overrides": {
+        "orientation=up_north": {
+          "unit_cube": true,
+          "material_instances": {
+            "up": {
+              "texture": "toilet_quartz_top",
+              "render_method": "alpha_test",
+              "face_dimming": true,
+              "ambient_occlusion": true
+            },
+            "down": {
+              "texture": "toilet_quartz_bottom",
+              "render_method": "alpha_test",
+              "face_dimming": true,
+              "ambient_occlusion": true
+            },
+            "*": {
+              "texture": "toilet_quartz_side",
+              "render_method": "alpha_test",
+              "face_dimming": true,
+              "ambient_occlusion": true
+            }
+          },
+          "transformation": {
+            "scale": [0.875, 0.75, 0.875],
+            "translation": [0, -2, 0],
+            "rotation": [0, 0, 0]
+          }
+        }
+      }
+    },
+    "minecraft:lightning_rod": {
+      "name": "toilet_seat",
+      "display_name": "Toilet Seat",
+      "only_override_states": true,
+      "state_overrides": {
+        "facing=up,powered=false,waterlogged=false": {
+          "unit_cube": true,
+          "material_instances": {
+            "*": {
+              "texture": "toilet_seat",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "transformation": {
+            "scale": [0.75, 0.125, 0.875],
+            "translation": [0, 6, 0],
+            "rotation": [0, 0, 0]
+          }
+        },
+        "facing=up,powered=true,waterlogged=false": {
+          "unit_cube": true,
+          "material_instances": {
+            "*": {
+              "texture": "toilet_seat",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "transformation": {
+            "scale": [0.75, 0.875, 0.125],
+            "translation": [0, 1, 6],
+            "rotation": [0, 0, 0]
+          }
+        }
+      }
+    }
+  }
+}

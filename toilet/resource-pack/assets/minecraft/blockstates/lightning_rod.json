@@ -1,0 +1,20 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "powered": "false"
+      },
+      "apply": {
+        "model": "toiletplugin:block/toilet_seat_down"
+      }
+    },
+    {
+      "when": {
+        "powered": "true"
+      },
+      "apply": {
+        "model": "toiletplugin:block/toilet_seat_up"
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "resource_pack_name": "toilet_bedrock_pack",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "toilet_quartz_side": {
+      "textures": "textures/blocks/quartz_block_side"
+    },
+    "toilet_quartz_top": {
+      "textures": "textures/blocks/quartz_block_top"
+    },
+    "toilet_quartz_bottom": {
+      "textures": "textures/blocks/quartz_block_bottom"
+    },
+    "toilet_seat": {
+      "textures": "textures/blocks/iron_block"
+    }
+  }
+}

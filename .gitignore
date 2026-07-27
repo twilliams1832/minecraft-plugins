@@ -1,0 +1,22 @@
+# Build outputs
+**/target/
+**/build/
+**/out/
+
+# Java archives and binaries
+**/*.jar
+**/*.war
+**/*.ear
+**/*.class
+
+# Gradle / Maven local caches
+**/.gradle/
+**/.m2/
+
+# Tooling
+**/.codex/
+**/.idea/
+**/.vscode/
+
+# OS noise
+**/.DS_Store

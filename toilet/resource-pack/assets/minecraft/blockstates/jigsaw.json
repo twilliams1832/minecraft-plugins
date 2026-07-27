@@ -1,0 +1,9 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "toiletplugin:block/toilet_bowl"
+      }
+    }
+  ]
+}

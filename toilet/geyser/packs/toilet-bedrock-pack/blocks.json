@@ -1,0 +1,9 @@
+{
+  "format_version": "1.19.30",
+  "toilet_bowl": {
+    "sound": "stone"
+  },
+  "toilet_seat": {
+    "sound": "metal"
+  }
+}

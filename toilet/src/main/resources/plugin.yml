@@ -1,0 +1,17 @@
+name: ToiletPlugin
+version: ${version}
+main: com.example.toiletplugin.ToiletPlugin
+api-version: "1.20"
+description: Adds functional toilet blocks to your server.
+author: YourName
+
+commands:
+  placetoilet:
+    description: Gives you a custom toilet item to place.
+    usage: /placetoilet
+    permission: toiletplugin.place
+
+permissions:
+  toiletplugin.place:
+    description: Allows the player to place toilet blocks.
+    default: true

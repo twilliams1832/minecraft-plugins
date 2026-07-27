@@ -1,0 +1,45 @@
+{
+  "textures": {
+    "quartz": "minecraft:block/quartz_block_side",
+    "top": "minecraft:block/quartz_block_top",
+    "bottom": "minecraft:block/quartz_block_bottom"
+  },
+  "elements": [
+    {
+      "from": [1, 0, 1],
+      "to": [15, 10, 15],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#quartz" },
+        "south": { "texture": "#quartz" },
+        "west": { "texture": "#quartz" },
+        "east": { "texture": "#quartz" }
+      }
+    },
+    {
+      "from": [3, 10, 3],
+      "to": [13, 13, 13],
+      "faces": {
+        "down": { "texture": "#top" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#quartz" },
+        "south": { "texture": "#quartz" },
+        "west": { "texture": "#quartz" },
+        "east": { "texture": "#quartz" }
+      }
+    },
+    {
+      "from": [5, 13, 11],
+      "to": [11, 16, 15],
+      "faces": {
+        "down": { "texture": "#top" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#quartz" },
+        "south": { "texture": "#quartz" },
+        "west": { "texture": "#quartz" },
+        "east": { "texture": "#quartz" }
+      }
+    }
+  ]
+}
