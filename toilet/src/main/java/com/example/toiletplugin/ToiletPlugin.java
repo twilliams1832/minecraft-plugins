@@ -24,8 +24,9 @@ public class ToiletPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ToiletInteractListener(this, toiletManager), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(toiletManager), this);
 
-        // Register the /placetoilet command handler
+        // Register the toilet item command handlers
         getCommand("placetoilet").setExecutor(this);
+        getCommand("placetoiletex").setExecutor(this);
 
         getLogger().info("ToiletPlugin enabled! Nature calls.");
     }
@@ -40,21 +41,28 @@ public class ToiletPlugin extends JavaPlugin {
     }
 
     /**
-     * Handles the /placetoilet command.
-     * Gives the player a custom toilet item they can place later.
+     * Handles the toilet item commands.
+     * Gives the player either a stable or experimental toilet item they can place later.
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage("Only players can receive toilet items.");
+            return true;
+        }
+
+        if (!player.hasPermission("toiletplugin.place")) {
+            player.sendMessage("§cYou don't have permission to place toilets.");
+            return true;
+        }
+
         if (command.getName().equalsIgnoreCase("placetoilet")) {
-            if (!(sender instanceof Player player)) {
-                sender.sendMessage("Only players can receive toilet items.");
-                return true;
-            }
-            if (!player.hasPermission("toiletplugin.place")) {
-                player.sendMessage("§cYou don't have permission to place toilets.");
-                return true;
-            }
             toiletManager.giveToiletItem(player);
+            return true;
+        }
+
+        if (command.getName().equalsIgnoreCase("placetoiletex")) {
+            toiletManager.giveExperimentalToiletItem(player);
             return true;
         }
         return false;

@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.example'
-version = '1.1.0'
+version = '1.2.0'
 description = 'ToiletPlugin - Functional toilet blocks for PaperMC 1.20+'
 
 // Java 17 required for modern Paper API

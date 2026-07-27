@@ -60,6 +60,19 @@ public class ToiletInteractListener implements Listener {
             return;
         }
 
+        if (manager.isExperimentalToiletItem(heldItem)) {
+            event.setCancelled(true);
+            if (!player.hasPermission("toiletplugin.place")) {
+                player.sendMessage("§cYou don't have permission to place toilets.");
+                return;
+            }
+
+            if (manager.placeToiletOnTop(player, block, true) && player.getGameMode() != GameMode.CREATIVE) {
+                heldItem.setAmount(heldItem.getAmount() - 1);
+            }
+            return;
+        }
+
         // --- Toilet Bowl interaction ---
         if (manager.isToiletBowl(block)) {
             event.setCancelled(true); // Prevent stair interaction (e.g. opening inventory)

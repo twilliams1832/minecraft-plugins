@@ -24,7 +24,7 @@ Instead, it uses reserved placeholder blocks internally so Java and Bedrock can 
 - seat down: `minecraft:lightning_rod[facing=up,powered=false,waterlogged=false]`
 - seat up: `minecraft:lightning_rod[facing=up,powered=true,waterlogged=false]`
 
-That placeholder design is the key to the cross-platform setup.
+That placeholder design turned out to be too disruptive for normal gameplay, so the current stable plugin places vanilla `QUARTZ_STAIRS` and `IRON_TRAPDOOR` again while the cross-platform visuals remain experimental.
 
 ## Project Layout
 
@@ -45,7 +45,7 @@ That placeholder design is the key to the cross-platform setup.
 │       ├── java
 │       └── resources
 └── target
-    ├── ToiletPlugin-1.1.0.jar
+    ├── ToiletPlugin-1.2.0.jar
     ├── toilet-resource-pack.zip
     └── toilet-bedrock-pack.zip
 ```
@@ -65,7 +65,7 @@ mvn clean package
 
 Artifacts:
 
-- plugin jar: [target/ToiletPlugin-1.1.0.jar](/home/tim/minecraft-plugins/toilet/target/ToiletPlugin-1.1.0.jar)
+- plugin jar: [target/ToiletPlugin-1.2.0.jar](/home/tim/minecraft-plugins/toilet/target/ToiletPlugin-1.2.0.jar)
 - Java resource pack: [target/toilet-resource-pack.zip](/home/tim/minecraft-plugins/toilet/target/toilet-resource-pack.zip)
 - Bedrock resource pack: [target/toilet-bedrock-pack.zip](/home/tim/minecraft-plugins/toilet/target/toilet-bedrock-pack.zip)
 
@@ -78,7 +78,7 @@ gradle build
 ## Install On Paper
 
 1. Build the plugin.
-2. Copy [target/ToiletPlugin-1.1.0.jar](/home/tim/minecraft-plugins/toilet/target/ToiletPlugin-1.1.0.jar) into your Paper server `plugins/` directory.
+2. Copy [target/ToiletPlugin-1.2.0.jar](/home/tim/minecraft-plugins/toilet/target/ToiletPlugin-1.2.0.jar) into your Paper server `plugins/` directory.
 3. Restart the server.
 
 ## Java Client Resource Pack
@@ -152,7 +152,7 @@ For a full cross-platform deploy:
    mvn clean package
    ```
 2. Copy plugin jar to Paper:
-   - [target/ToiletPlugin-1.1.0.jar](/home/tim/minecraft-plugins/toilet/target/ToiletPlugin-1.1.0.jar)
+   - [target/ToiletPlugin-1.2.0.jar](/home/tim/minecraft-plugins/toilet/target/ToiletPlugin-1.2.0.jar)
 3. Host the Java resource pack:
    - [target/toilet-resource-pack.zip](/home/tim/minecraft-plugins/toilet/target/toilet-resource-pack.zip)
 4. Update `server.properties` with the Java resource-pack URL
@@ -167,23 +167,35 @@ For a full cross-platform deploy:
 
 | Command | Permission | Description |
 |---|---|---|
-| `/placetoilet` | `toiletplugin.place` | Gives the player a custom toilet item |
+| `/placetoilet` | `toiletplugin.place` | Gives the player the stable toilet item |
+| `/placetoiletex` | `toiletplugin.place` | Gives the player the experimental toilet item |
 
 Current permission default:
 
 - `toiletplugin.place`: `default: true`
 
-That means normal players can use `/placetoilet` without being op.
+That means normal players can use both commands without being op.
 
 ## In-Game Flow
 
-1. Run `/placetoilet`
-2. Receive a custom toilet item
-3. Right-click a block with the item to place the toilet
-4. Right-click the bowl with an empty hand to sit
-5. Right-click again while seated to flush
-6. Sneak + right-click while seated to stand up
-7. Right-click the seat to toggle it
+### Stable path
+
+1. Run `/placetoilet`.
+2. Receive the stable toilet item.
+3. Right-click a block with the item to place the toilet.
+4. Right-click the bowl with an empty hand to sit.
+5. Right-click the bowl again while seated to flush.
+6. Sneak + right-click while seated to stand up.
+7. Right-click the seat to toggle it.
+
+### Experimental path
+
+1. Run `/placetoiletex`.
+2. Receive the experimental toilet item.
+3. Right-click a block with the item to place the placeholder-block version.
+4. Use this path for visual and integration testing only.
+
+The experimental route may still have broken visuals, collision issues, or missing interaction behavior depending on the current test state.
 
 ## Troubleshooting
 
@@ -225,6 +237,7 @@ That is expected for the Java `server.properties` resource pack. Bedrock clients
   - minor for backward-compatible features
   - major for breaking changes
 - The current Java and Bedrock visuals are proof-of-concept scaffolding, not polished final art.
+- The placeholder-block cross-platform rendering path is currently experimental and not enabled in the stable runtime because it broke collision and interaction behavior in-game.
 - The logic and packaging path are in place so future custom textures/models can be dropped in without redesigning the whole flow.
 - Geyser custom block support can be sensitive to Bedrock/Geyser version changes, so if a future upgrade breaks visuals, check Geyser’s custom block documentation first.
 

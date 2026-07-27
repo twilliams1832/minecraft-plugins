@@ -10,6 +10,10 @@ commands:
     description: Gives you a custom toilet item to place.
     usage: /placetoilet
     permission: toiletplugin.place
+  placetoiletex:
+    description: Gives you an experimental toilet item for placeholder-block testing.
+    usage: /placetoiletex
+    permission: toiletplugin.place
 
 permissions:
   toiletplugin.place:

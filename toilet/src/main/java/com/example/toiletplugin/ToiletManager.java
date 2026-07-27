@@ -5,7 +5,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Openable;
-import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -49,12 +48,14 @@ public class ToiletManager {
     private final NamespacedKey IS_TOILET_BOWL_KEY;
     private final NamespacedKey IS_TOILET_SEAT_KEY;
     private final NamespacedKey TOILET_ITEM_KEY;
+    private final NamespacedKey EXPERIMENTAL_TOILET_ITEM_KEY;
 
     public ToiletManager(ToiletPlugin plugin) {
         this.plugin = plugin;
         IS_TOILET_BOWL_KEY = new NamespacedKey(plugin, "is_toilet_bowl");
         IS_TOILET_SEAT_KEY = new NamespacedKey(plugin, "is_toilet_seat");
         TOILET_ITEM_KEY = new NamespacedKey(plugin, "toilet_item");
+        EXPERIMENTAL_TOILET_ITEM_KEY = new NamespacedKey(plugin, "experimental_toilet_item");
     }
 
     // =========================================================================
@@ -69,6 +70,20 @@ public class ToiletManager {
         if (leftovers.isEmpty()) {
             player.sendMessage("§aYou received a toilet item. Right-click a block to place it.");
             player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.8f, 1.1f);
+            return;
+        }
+
+        player.sendMessage("§cYour inventory is full.");
+    }
+
+    /**
+     * Gives the player a tagged experimental toilet item.
+     */
+    public void giveExperimentalToiletItem(Player player) {
+        HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(createExperimentalToiletItem());
+        if (leftovers.isEmpty()) {
+            player.sendMessage("§6You received an experimental toilet item. Right-click a block to place it.");
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.8f, 0.8f);
             return;
         }
 
@@ -97,6 +112,28 @@ public class ToiletManager {
     }
 
     /**
+     * Creates the experimental toilet item that places placeholder blocks.
+     */
+    public ItemStack createExperimentalToiletItem() {
+        ItemStack item = new ItemStack(Material.JIGSAW);
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return item;
+        }
+
+        meta.setDisplayName("§6Experimental Toilet");
+        meta.setLore(Arrays.asList(
+            "§7Right-click a block to place.",
+            "§7Uses cross-platform placeholder blocks.",
+            "§cMay have broken visuals or collision."
+        ));
+        meta.setCustomModelData(1002);
+        meta.getPersistentDataContainer().set(EXPERIMENTAL_TOILET_ITEM_KEY, PersistentDataType.BYTE, (byte) 1);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    /**
      * Returns true when the stack is one of this plugin's custom toilet items.
      */
     public boolean isToiletItem(ItemStack item) {
@@ -110,6 +147,22 @@ public class ToiletManager {
         }
 
         return meta.getPersistentDataContainer().has(TOILET_ITEM_KEY, PersistentDataType.BYTE);
+    }
+
+    /**
+     * Returns true when the stack is one of this plugin's experimental toilet items.
+     */
+    public boolean isExperimentalToiletItem(ItemStack item) {
+        if (item == null || item.getType() != Material.JIGSAW) {
+            return false;
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return false;
+        }
+
+        return meta.getPersistentDataContainer().has(EXPERIMENTAL_TOILET_ITEM_KEY, PersistentDataType.BYTE);
     }
 
     /**
@@ -134,6 +187,15 @@ public class ToiletManager {
      * @return true when the placement succeeds
      */
     public boolean placeToiletOnTop(Player player, Block target) {
+        return placeToiletOnTop(player, target, false);
+    }
+
+    /**
+     * Places either the stable or experimental toilet on the clicked support block.
+     *
+     * @return true when the placement succeeds
+     */
+    public boolean placeToiletOnTop(Player player, Block target, boolean experimental) {
         if (target == null) {
             player.sendMessage("§cLook at a block to place the toilet on top of it.");
             return false;
@@ -149,16 +211,32 @@ public class ToiletManager {
             return false;
         }
 
-        // --- Place bowl placeholder block ---
-        bowlBlock.setType(Material.JIGSAW, false);
-        bowlBlock.setBlockData(Bukkit.createBlockData(TOILET_BOWL_BLOCK_DATA), false);
+        if (experimental) {
+            bowlBlock.setType(Material.JIGSAW, false);
+            bowlBlock.setBlockData(Bukkit.createBlockData(TOILET_BOWL_BLOCK_DATA), false);
+        } else {
+            // --- Place bowl (QUARTZ_STAIRS) ---
+            bowlBlock.setType(Material.QUARTZ_STAIRS);
+            // Orient stairs to face the player for aesthetics
+            Stairs stairsData = (Stairs) bowlBlock.getBlockData();
+            stairsData.setFacing(player.getFacing().getOppositeFace());
+            bowlBlock.setBlockData(stairsData);
+        }
 
         // Tag the bowl block via PersistentDataContainer so we can identify it on interact
         markBlock(bowlBlock, IS_TOILET_BOWL_KEY);
 
-        // --- Place seat placeholder block ---
-        seatBlock.setType(Material.LIGHTNING_ROD, false);
-        seatBlock.setBlockData(Bukkit.createBlockData(TOILET_SEAT_DOWN_BLOCK_DATA), false);
+        if (experimental) {
+            seatBlock.setType(Material.LIGHTNING_ROD, false);
+            seatBlock.setBlockData(Bukkit.createBlockData(TOILET_SEAT_DOWN_BLOCK_DATA), false);
+        } else {
+            // --- Place seat (IRON_TRAPDOOR) ---
+            seatBlock.setType(Material.IRON_TRAPDOOR);
+            // Start with seat down (closed trapdoor)
+            Openable trapdoor = (Openable) seatBlock.getBlockData();
+            trapdoor.setOpen(false);
+            seatBlock.setBlockData(trapdoor);
+        }
 
         // Tag the seat block
         markBlock(seatBlock, IS_TOILET_SEAT_KEY);
@@ -168,7 +246,11 @@ public class ToiletManager {
         String key = locationKey(bowlBlock.getLocation());
         toilets.put(key, instance);
 
-        player.sendMessage("§aToilet placed! Right-click the bowl to flush, right-click the seat to raise/lower.");
+        if (experimental) {
+            player.sendMessage("§6Experimental toilet placed. Placeholder visuals and collision may be unstable.");
+        } else {
+            player.sendMessage("§aToilet placed! Right-click the bowl to flush, right-click the seat to raise/lower.");
+        }
         player.playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, 1.0f, 1.0f);
         return true;
     }
@@ -274,19 +356,20 @@ public class ToiletManager {
     // =========================================================================
 
     /**
-     * Toggles the placeholder seat between the "down" and "up" states.
+     * Toggles the iron trapdoor seat open/closed.
+     * Open = seat up, Closed = seat down.
      */
     public void toggleSeat(Player player, Block seatBlock) {
         BlockData data = seatBlock.getBlockData();
 
-        if (!(data instanceof Powerable powerable)) {
+        if (!(data instanceof Openable openable)) {
             player.sendMessage("§cThis seat block is invalid.");
             return;
         }
 
-        boolean nowOpen = !powerable.isPowered();
-        powerable.setPowered(nowOpen);
-        seatBlock.setBlockData(powerable, false);
+        boolean nowOpen = !openable.isOpen();
+        openable.setOpen(nowOpen);
+        seatBlock.setBlockData(openable);
 
         // Play trapdoor sound
         Sound sound = nowOpen ? Sound.BLOCK_IRON_TRAPDOOR_OPEN : Sound.BLOCK_IRON_TRAPDOOR_CLOSE;
